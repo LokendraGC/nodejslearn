@@ -1,5 +1,5 @@
 {
-  "name": "03_npm_modules",
+  "name": "04_node_event_logger",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -11,7 +11,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Node event logger",
   "dependencies": {
     "date-fns": "^4.1.0",
     "uuid": "^13.0.0"

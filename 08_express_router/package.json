@@ -1,7 +1,7 @@
 {
-  "name": "07express_middleware",
+  "name": "08express_router",
   "version": "1.0.0",
-  "description": "Express introduction",
+  "description": "Express with router",
   "main": "server.js",
   "type": "module",
   "scripts": {

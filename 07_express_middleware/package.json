@@ -1,5 +1,5 @@
 {
-  "name": "06expressintro",
+  "name": "07express_middleware",
   "version": "1.0.0",
   "main": "server.js",
   "type": "module",
@@ -11,7 +11,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Express with middleware",
   "dependencies": {
     "cors": "^2.8.6",
     "date-fns": "^4.1.0",

@@ -1,7 +1,7 @@
 {
-  "name": "10express_authentication",
+  "name": "12express_roles",
   "version": "1.0.0",
-  "description": "Express introduction",
+  "description": "Express with roles",
   "main": "server.js",
   "type": "module",
   "scripts": {
