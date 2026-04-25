@@ -1,23 +1,7 @@
 import bcrypt from 'bcrypt';
-import users from '../models/users.json' with { type: 'json' };
+import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
 
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const fsPromises = fs.promises;
-
-
-const userDb = {
-    users: users,
-    setUsers: function (data) {
-        this.users = data;
-    }
-}
 
 export const loginUser = async (req, res) => {
 
@@ -27,7 +11,7 @@ export const loginUser = async (req, res) => {
         return res.status(400).json({ 'message': 'Email and password are required.' });
     }
 
-    const foundUser = userDb.users.find(person => person.email === email);
+    const foundUser = await User.findOne({ email: email }).exec();
 
     if (!foundUser) {
         return res.status(401).json({ 'message': 'Unauthorized' });
@@ -68,22 +52,8 @@ export const loginUser = async (req, res) => {
 
 
             // saving refresh token with current user
-            const otherUsers = userDb.users.filter(
-                person => person.email !== foundUser.email
-            );
-
-            // Best practice: store ONLY refreshToken in DB (not accessToken)
-            const currentUser = {
-                ...foundUser,
-                refreshToken
-            };
-
-            userDb.setUsers([...otherUsers, currentUser]);
-
-            await fsPromises.writeFile(
-                path.join(__dirname, '..', 'models', 'users.json'),
-                JSON.stringify(userDb.users)
-            );
+            foundUser.refreshToken = refreshToken;
+            const result = await foundUser.save();
 
             // sending refresh token as http only cookie to the client
             res.cookie('jwt', refreshToken, {
@@ -93,7 +63,7 @@ export const loginUser = async (req, res) => {
                 maxAge: 24 * 60 * 60 * 1000 // 1 day
             });
 
-            res.json({ 'message': `User ${foundUser.username} logged in successfully.`, accessToken });
+            res.json({ 'message': `User ${result.username} logged in successfully.`, accessToken });
         } else {
             res.status(401).json({ 'message': 'Unauthorized' });
         }

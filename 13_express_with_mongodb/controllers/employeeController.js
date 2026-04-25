@@ -1,65 +1,66 @@
-import data from '../models/employee.json' with { type: 'json' }
-
+import Employee from '../models/Employee.js';
 
 // get all employees
-export const getAllEmployees = (req, res) => {
-    res.json(data)
+export const getAllEmployees = async (req, res) => {
+    const employees = await Employee.find().lean().exec();
+    if (!employees) {
+        return res.status(404).json({ message: 'No employees found' })
+    }
+    res.json(employees)
 }
 
 // create employee
-export const createEmployee = (req, res) => {
-    const newEmployee = {
-        id: data.length ? data[data.length - 1].id + 1 : 1,
-        "firstname": req.body.firstname,
-        "lastname": req.body.lastname
-    };
-
-    if (!newEmployee.firstname || !newEmployee.lastname) {
+export const createEmployee = async (req, res) => {
+    if (!req.body.firstname || !req.body.lastname) {
         return res.status(400).json({ message: 'Firstname and lastname are required' })
     }
 
-    data.push(newEmployee)
-    res.status(201).json({ data, 'message': 'Employee created successfully' })
+    const employee = await Employee.create({
+        firstname: req.body.firstname,
+        lastname: req.body.lastname
+    });
+    res.status(201).json({ message: 'Employee created successfully', employee })
 }
 
 // update employee
-export const updateEmployee = (req, res) => {
+export const updateEmployee = async (req, res) => {
 
-    const employee = data.find(emp => emp.id === parseInt(req.params.id));
+    const employee = await Employee.findById(req.params.id).exec();
 
     if (!employee) {
         return res.status(404).json({ message: 'Employee not found' })
     }
 
-    if (req.body.firstname) employee.firstname = req.body.firstname;
-    if (req.body.lastname) employee.lastname = req.body.lastname;
+    employee.firstname = req.body.firstname || employee.firstname;
+    employee.lastname = req.body.lastname || employee.lastname;
 
-    res.json({ data, 'message': 'Employee updated successfully' })
+    const updatedEmployee = await employee.save();
+    res.json({ message: 'Employee updated successfully', employee: updatedEmployee })
 
 }
 
 
 // delete employee
-export const deleteEmployee = (req, res) => {
+export const deleteEmployee = async (req, res) => {
 
-    const employee = data.find(emp => emp.id === parseInt(req.params.id))
+    const employee = await Employee.findById(req.params.id).exec();
 
-    if (employee === -1) {
-        return res.status(404).json({ message: 'Employee not found' })
-    }
-
-    const deleteEmployee = data.splice(data.indexOf(employee), 1)
-
-    res.json({ data, 'message': 'Employee deleted successfully' })
-}
-
-// get employee
-export const getEmployeeById = (req, res) => {
-    const employee = data.find(emp => emp.id === parseInt(req.params.id))
     if (!employee) {
         return res.status(404).json({ message: 'Employee not found' })
     }
-    res.json({ employee, 'message': 'Employee found successfully' })
+
+    await employee.deleteOne();
+
+    res.json({ message: 'Employee deleted successfully' })
+}
+
+// get employee
+export const getEmployeeById = async (req, res) => {
+    const employee = await Employee.findById(req.params.id).exec();
+    if (!employee) {
+        return res.status(404).json({ message: 'Employee not found' })
+    }
+    res.json({ message: 'Employee found successfully', employee })
 }
 
 // JSON.parse() - convert JSON string to JavaScript object

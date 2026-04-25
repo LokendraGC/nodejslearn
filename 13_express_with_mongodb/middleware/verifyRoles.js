@@ -18,6 +18,7 @@ export const verifyRoles = (...allowedRoles) => {
        console.log("ROLES ARRAY:", rolesArray);
        console.log("USER ROLES:", req.roles);
        
+    //    fix this code: TypeError: req.roles.map is not a function 
         const result = req.roles.map(role => rolesArray.includes(role)).find(val => val === true);
 
         if (!result) {

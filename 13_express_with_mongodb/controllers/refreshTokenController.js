@@ -1,15 +1,7 @@
-import users from '../models/users.json' with { type: 'json' };
+import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 
-
-const userDb = {
-    users: users,
-    setUsers: function (data) {
-        this.users = data;
-    }
-}
-
-export const handleRefreshToken = (req, res) => {
+export const handleRefreshToken = async (req, res) => {
 
     const cookies = req.cookies;
 
@@ -20,9 +12,9 @@ export const handleRefreshToken = (req, res) => {
     const refreshToken = cookies.jwt;
 
     console.log("COOKIE:", refreshToken);
-    console.log("DB:", userDb.users.map(u => u.refreshToken));
+    console.log("DB:", await User.find().select('refreshToken').lean().exec());
 
-    const foundUser = userDb.users.find(person => person.refreshToken === refreshToken);
+    const foundUser = await User.findOne({ refreshToken: refreshToken }).exec();
 
     if (!foundUser) {
         return res.status(403).json({ 'message': 'Forbidden' });
